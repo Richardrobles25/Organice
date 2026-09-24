@@ -81,10 +81,11 @@ Si necesitas algo del otro track que aún no existe, usa la versión simulada de
 
 ## 6. Estado del proyecto
 
-- **Fase actual:** Por actualizar (ver checklist en la Guía v2).
+- **Fase actual:** Fase 0 — Preparación. Identidad visual lista (idea, nombre y logo definidos). Repositorio de GitHub y proyecto de Supabase (`OrganiceBD`, región `us-east-2`) ya creados. Faltan por resolver: acuerdo entre socios, asignación de tracks, resto de cuentas de servicio, gestor de contraseñas compartido y trámites legales de la Fase 4.
 - **Track A asignado a:** Por definir.
 - **Track B asignado a:** Por definir.
-- **Pasarela de pagos elegida:** Por definir (Stripe Connect o Conekta).
+- **Correo del proyecto:** `organiceadmin@gmail.com` (cuenta principal para todas las cuentas de servicio). Se decidió NO comprar dominio propio por ahora (costo); no usar un dominio en correos, contratos ni configuración hasta que el equipo lo retome.
+- **Pasarela de pagos elegida:** Por definir (Stripe Connect o Conekta) — cuentas de ambas en proceso de alta.
 - **Figura legal / RFC:** Por definir.
 
 > Actualiza esta sección conforme avance el proyecto, para que cualquier sesión nueva de Claude Code sepa en qué punto van.
