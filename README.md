@@ -75,6 +75,8 @@ cp .env.example .env    # llenar las variables
 npm run dev
 ```
 
+GitHub Actions revisa cada Pull Request (aplicación y base de datos, ver `.github/workflows/ci.yml`). Si sale en rojo, no se hace merge.
+
 Antes de abrir un Pull Request:
 
 ```bash
