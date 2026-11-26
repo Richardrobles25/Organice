@@ -16,12 +16,12 @@ Las invitaciones digitales (RF-049 a RF-055) son una herramienta propia de ORGAN
 
 ## 2. Reglas de negocio (no negociables sin aprobación del equipo)
 
-- **El pago pasa por la app.** Nada de "solo contacto, pagas aparte" y nada de pagar en efectivo directo al proveedor (el efectivo se paga por OXXO). El usuario aparta con un anticipo que fija el proveedor (20% a 50% del precio del servicio, con un mínimo de $500 MXN), reembolsable en su totalidad durante 7 días, y paga con tarjeta, OXXO o SPEI.
+- **El pago pasa por la app.** Nada de "solo contacto, pagas aparte" y nada de pagar en efectivo directo al proveedor (el efectivo se paga por OXXO). Cada proveedor decide si exige el anticipo para apartar (opción por defecto) o si permite apartar sin pagar y cobrarlo dentro de las 24 horas siguientes. El anticipo lo fija el proveedor (20% a 50% del precio del servicio, con un mínimo de $500 MXN), reembolsable en su totalidad durante 7 días, y paga con tarjeta, OXXO o SPEI.
 - **Pagos divididos (split).** ORGANICE nunca retiene dinero de proveedores. La pasarela manda su parte al proveedor y la comisión a ORGANICE directamente. Lo que antes se llamaba "retención" es un pago diferido que maneja la pasarela: libera la parte del proveedor 24 a 48 horas después del evento. Confirmar con un abogado que esto no requiere ningún permiso.
 - **Comisión:** 7% al proveedor del plan gratuito y 4% al del plan Premium. Al usuario, una "tarifa de servicio" de 3% que se puede activar o desactivar desde la configuración: arranca en 0% durante la beta cerrada y se activa en el lanzamiento público. Proveedores "fundadores" pueden tener 0% de comisión, pero la cuota de la pasarela nunca la absorbe ORGANICE.
 - **ORGANICE solo factura su comisión.** No emite CFDI al usuario final por el servicio del proveedor; eso lo factura el proveedor con su propio RFC.
-- **Anti-fuga de comisión:** el contacto (teléfono/WhatsApp) del proveedor se muestra al usuario solo después de apartar. Solo quien reservó por la app puede dejar reseña. La tasa de cierre por la app se usa internamente para el ranking del proveedor, nunca como etiqueta pública de "este proveedor incumple".
-- **Reserva instantánea:** si la fecha y el turno están libres, la reserva queda confirmada al instante, sin aprobación del proveedor. El proveedor tiene 24 horas para cancelar sin penalización; después hay multa (monto por definir) y baja de visibilidad. Si el proveedor cancela, el usuario recibe el 100% de reembolso y alternativas. La tasa de cancelación del proveedor se usa internamente para el ranking, nunca como etiqueta pública. Al lanzamiento es obligatoria para todos; la modalidad "con aprobación" queda como mejora futura.
+- **Anti-fuga de comisión:** el contacto (teléfono/WhatsApp) del proveedor se muestra al usuario solo después de apartar con el anticipo pagado. Solo quien reservó por la app puede dejar reseña. La tasa de cierre por la app se usa internamente para el ranking del proveedor, nunca como etiqueta pública de "este proveedor incumple".
+- **Reserva instantánea:** si la fecha y el turno están libres, la reserva queda confirmada al instante, sin aprobación del proveedor (si exige anticipo, al recibir el pago). El proveedor tiene 24 horas para cancelar sin penalización; después hay multa (monto por definir) y baja de visibilidad. Si el proveedor cancela, el usuario recibe el 100% de reembolso y alternativas. La tasa de cancelación del proveedor se usa internamente para el ranking, nunca como etiqueta pública. Al lanzamiento es obligatoria para todos; la modalidad "con aprobación" queda como mejora futura.
 - **Calificación de clientes:** después del evento el proveedor califica al cliente (1 a 5 estrellas y categorías). Es visible solo para otros proveedores y administración, nunca pública. Las calificaciones de ambos lados se publican a ciegas, al mismo tiempo, cuando ambas partes calificaron o a los 14 días.
 - **Doble reserva:** debe ser imposible a nivel de base de datos (no solo validación en el frontend), incluso con dos solicitudes simultáneas.
 - **Un proveedor puede bloquear fechas vendidas fuera de la app** (manual o por sincronización de Google Calendar), para que el calendario nunca mienta.
@@ -58,6 +58,8 @@ Carpetas: `src/features/{provider,admin,notifications,account,media,subscription
 Tablas: `providers, services, prices, media, availability, subscriptions, payouts, claims, notifications, coupons, categories, banners, audit_logs, client_reviews, provider_penalties`
 Requisitos: RF-002, 003, 005, 008, 010 a 012, RF-022 a 024, RF-044, RF-056 a 067, RF-069 a 104, RF-109, 111, 112, 114, 115, 118, 119, RF-120, RF-121
 
+**Tabla compartida:** `resource_slots` (horarios ocupados). La usan los dos tracks, se escribe solo con funciones RPC y se cambia con PR aprobado por ambos.
+
 **Regla de oro:** cada quien modifica solo las carpetas y tablas de su track. Los contratos compartidos (`docs/contratos.md`, tipos de TypeScript, tablas de otro track) solo se cambian con Pull Request aprobado por ambos socios.
 
 ### Contratos compartidos (definidos en la Fase 1, en `docs/contratos.md`)
@@ -69,7 +71,7 @@ Requisitos: RF-002, 003, 005, 008, 010 a 012, RF-022 a 024, RF-044, RF-056 a 067
 - `notify(usuario, tipo, datos)` — dueño: Track B
 - `get_provider_public(provider)` — dueño: Track B
 - `providers.payment_account_id` — alta: Track B, lo usa Track A para cobros divididos
-- Estados de reserva: `confirmada → anticipo_pagado → pagada → completada`, además `expirada`, `cancelada` (con quién canceló: usuario o proveedor, y si fue dentro de las 24 h) y `reprogramada`. Ya no existe el estado `pendiente` — dueño: Track A
+- Estados de reserva: `confirmada → anticipo_pagado → pagada → completada`, además `expirada` y `cancelada` (con quién canceló: usuario o proveedor, y si fue dentro de las 24 h). Ya no existen los estados `pendiente` ni `reprogramada`: una reprogramación conserva el estado de la reserva y se guarda en `booking_changes`. Con proveedores que exigen anticipo, la reserva pasa por `esperando_pago` (15 minutos con tarjeta; hasta 24 h con OXXO o SPEI) y de ahí a `anticipo_pagado` o a `expirada`. Las 24 h del proveedor para cancelar empiezan cuando se recibe el pago. — dueño: Track A
 - `cancel_booking` registra quién cancela y calcula si cae dentro de la ventana de 24 h del proveedor; si el proveedor cancela fuera de ella, avisa a Track B para crear la penalización (`provider_penalties`)
 
 Si necesitas algo del otro track que aún no existe, usa la versión simulada del contrato, nunca esperes al otro.

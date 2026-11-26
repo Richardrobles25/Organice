@@ -370,17 +370,21 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 - Toda reserva pertenece a un evento. Si el usuario aparta un solo servicio, el sistema crea automáticamente un evento con ese servicio, y después puede agregar más servicios para la misma fecha (con el Armador o desde "Mis eventos").
 - Si la tarifa de servicio al usuario está activa (RF-095), se muestra como "Tarifa de servicio ORGANICE" en el resumen de pago.
 - Método de pago: tarjeta de crédito/débito, mediante la pasarela elegida (ver RF-105 y RF-106).
+- Mientras se espera el pago, la reserva queda en "Esperando pago" y la fecha bloqueada: 15 minutos con tarjeta y hasta 24 horas con OXXO o SPEI. Al recibirlo pasa a "Anticipo pagado" (ahí empiezan las 24 horas del proveedor para cancelar); si no llega, a "Expirada".
 - Si la fecha y el turno están libres, la reserva queda **confirmada al instante**, sin esperar la aprobación del proveedor (ver RF-070).
 - Confirmación por email y notificación inmediata al proveedor.
 - Comprobante descargable en PDF.
 
 #### RF-032 — Reserva sin pago (solo apartar)
 
-*Apartar la fecha sin pagar aún; la reserva queda confirmada al instante.*
+*Apartar la fecha sin pagar aún, solo con los proveedores que lo permiten.*
 
-- Si la fecha y el turno están libres, la reserva queda en estado "Confirmada" de inmediato (no hay estado "pendiente de aceptar").
+- Cada proveedor decide si exige el anticipo para apartar (opción por defecto) o si permite apartar sin pagar. La ficha lo indica antes de reservar.
+- Si el proveedor exige anticipo, esta opción no aparece: se aparta pagando (RF-031) y la reserva se confirma al recibir el pago.
+- Si el proveedor permite apartar sin pago y la fecha y el turno están libres, la reserva queda en estado "Confirmada" de inmediato (no hay estado "pendiente de aceptar").
 - La fecha queda bloqueada para otros usuarios.
 - El usuario tiene 24 horas para pagar el anticipo. Si no paga, la reserva pasa a "Expirada" y la fecha se libera.
+- El contacto del proveedor no se muestra hasta que se pague el anticipo.
 - Mientras corra la ventana de cancelación del proveedor (RF-070), el usuario ve el aviso "El proveedor puede cancelar sin costo en las primeras 24 horas".
 
 #### RF-033 — Pago del saldo restante
@@ -411,13 +415,15 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 
 #### RF-036 — Facturación electrónica (CFDI 4.0)
 
-*Emisión de factura fiscal mexicana al pagar.*
+*Datos fiscales del usuario y factura de lo que cobra ORGANICE. El servicio lo factura el proveedor.*
 
 - Formulario en checkout: RFC, razón social, uso de CFDI, régimen fiscal.
 - Integración con PAC autorizado (Facturama, Contpaq, etc.).
-- Emisión automática al confirmar el pago.
-- Descarga de XML y PDF de la factura.
-- Historial de facturas en el perfil del usuario.
+- ORGANICE emite CFDI automático solo por lo que cobra (la tarifa de servicio, cuando está activa).
+- El servicio lo factura el proveedor con su propio RFC; si el usuario pide factura, el proveedor recibe sus datos fiscales (RF-071). ORGANICE no emite ese CFDI.
+- Descarga de XML y PDF de las facturas emitidas por ORGANICE.
+- Historial de esas facturas en el perfil del usuario.
+- Pendiente de confirmar con el contador.
 
 #### RF-037 — Cancelación de reserva
 

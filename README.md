@@ -94,12 +94,15 @@ VITE_SUPABASE_ANON_KEY=
 Flujo de una reserva
 Estados previstos de una reserva (se definirán a detalle antes de programar):
 ```
+esperando pago ──► anticipo pagado     (proveedor que exige anticipo)
+
 confirmada ──► anticipo pagado ──► pagada ──► completada
     │                │              │
-    ├──► expirada    └──► cancelada ◄┘      (además: reprogramada)
+    ├──► expirada    └──► cancelada ◄┘
     └──► cancelada
 ```
-Confirmada: la fecha estaba libre, así que la reserva se confirma al instante. El proveedor tiene 24 horas para cancelar sin penalización.
+Esperando pago: solo si el proveedor exige anticipo; dura 15 minutos con tarjeta o hasta 24 h con OXXO o SPEI, y pasa a anticipo pagado o expirada.
+Confirmada: la fecha estaba libre, así que la reserva se confirma al instante (si el proveedor exige anticipo, al pagarlo). El proveedor tiene 24 horas para cancelar sin penalización.
 Expirada: el usuario no pagó el anticipo a tiempo.
 Cancelada: con o sin reembolso, según la política.
 Completada: el evento ya ocurrió.
