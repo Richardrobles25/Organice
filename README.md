@@ -50,30 +50,39 @@ La autenticación se maneja con Supabase Auth; no se implementa login a mano.
 ORGANICE no retiene dinero de proveedores: los pagos se dividen en la pasarela, que también libera la parte del proveedor 24 a 48 horas después del evento.
 Nunca se guardan datos de tarjetas.
 Estructura del repositorio
-> Estructura propuesta; se ajustará al crear el proyecto.
 ```
 organice/
-├── docs/               # Especificación, diagramas y decisiones
+├── Documentos/          # Especificación, guía, reglas y plan
+├── Logos/
+├── public/              # Íconos de la PWA
 ├── src/
-│   ├── components/     # Componentes reutilizables
-│   ├── features/       # Módulos por dominio (auth, search, bookings, provider, admin)
-│   ├── lib/            # Cliente de Supabase, utilidades, pagos
-│   └── pages/          # Pantallas
+│   ├── features/        # Una carpeta por módulo (ver reparto de tracks en CLAUDE.md)
+│   ├── shared/          # Componentes, utilidades y tipos compartidos (cambios con PR de ambos)
+│   └── test/            # Configuración de las pruebas
 ├── supabase/
-│   └── migrations/     # Migraciones de la base de datos
-├── tests/
-├── CLAUDE.md           # Contexto del proyecto para Claude Code
+│   └── migrations/      # Migraciones de la base de datos
+├── CLAUDE.md            # Contexto del proyecto para Claude Code
 └── README.md
 ```
 Cómo correr el proyecto
-> Pendiente: se completará cuando se inicialice el proyecto.
-Requisitos previos: Node.js (LTS), npm y una cuenta de Supabase.
+
+Requisitos previos: Node.js 24 (mínimo 22.12) y npm. La cuenta de Supabase hará falta a partir del cimiento 1.3.
 ```bash
-git clone https://github.com/<usuario>/organice.git
-cd organice
+git clone https://github.com/Richardrobles25/Organice.git
+cd Organice
 npm install
 cp .env.example .env    # llenar las variables
 npm run dev
+```
+
+Antes de abrir un Pull Request:
+
+```bash
+npm run typecheck
+npm run lint
+npm run format:check
+npm test
+npm run build
 ```
 Variables de entorno (`.env.example`):
 ```
