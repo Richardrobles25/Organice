@@ -84,6 +84,15 @@ npm run format:check
 npm test
 npm run build
 ```
+Base de datos local (necesita Docker Desktop abierto):
+
+```bash
+npm run db:start    # enciende la base (la primera vez descarga imágenes)
+npm run db:reset    # borra la base local y aplica todas las migraciones
+npm run db:test     # pruebas de la base, incluida la de reservas simultáneas
+npm run db:stop
+```
+
 Variables de entorno (`.env.example`):
 ```
 VITE_SUPABASE_URL=

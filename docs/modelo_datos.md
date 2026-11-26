@@ -1,6 +1,6 @@
 # ORGANICE · Modelo de datos (cimiento 1.3)
 
-**Estado: propuesta, pendiente de aprobación de Nicolás y Ricardo.** Todavía no hay migraciones ni nada creado en Supabase.
+**Estado: aprobado por Nicolás y Ricardo (PR #3).** Las migraciones están en `supabase/migrations/`; todavía no se aplican al proyecto de Supabase en la nube.
 
 76 tablas que cubren los 121 requisitos. Dueño **A** = Track A, **B** = Track B, **Compartida** = cambios solo con PR de ambos.
 
