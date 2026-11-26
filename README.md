@@ -1,10 +1,10 @@
 ORGANICE
-La app que te arma tu fiesta. Marketplace para encontrar, comparar y apartar todo lo necesario para una fiesta (salón, comida, espectáculo, mobiliario) según la fecha y el número de invitados. Empieza en Tepic, Nayarit, con la meta de operar a nivel nacional.
-> **Estado:** 🟡 Fase 0 – Validación. El MVP aún no está en desarrollo.
+La app que te arma tu fiesta. Marketplace para encontrar, comparar y apartar todo lo necesario para una fiesta (salón, banquete, espectáculo, mobiliario, decoración, fotografía y pastelería) según la fecha y el número de invitados, armando la fiesta completa o contratando cada servicio por separado. Empieza en Tepic, Nayarit, con la meta de operar a nivel nacional.
+> **Estado:** 🟡 Fase 0 – Preparación. El producto aún no está en desarrollo.
 ---
 Tabla de contenido
 El problema
-Alcance del MVP
+Alcance del producto
 Stack
 Estructura del repositorio
 Cómo correr el proyecto
@@ -16,35 +16,38 @@ Equipo
 El problema
 Organizar una fiesta en Tepic implica buscar proveedores en Facebook, pedir recomendaciones y llamar uno por uno para saber quién está disponible en la fecha. Los proveedores, por su lado, manejan sus reservas en agendas de papel o WhatsApp y sufren dobles reservas.
 ORGANICE centraliza la oferta con disponibilidad real por fecha y le da al proveedor una agenda digital para gestionar sus apartados.
-Alcance del MVP
-El MVP incluye solo salones de eventos. Las demás categorías llegan en fases posteriores.
+Alcance del producto
+Se construye el producto completo: los 121 requisitos (`RF-001` a `RF-121`) de la especificación, por bloques y en dos tracks. La beta cerrada en Tepic arrancará con salones y proveedores fundadores, pero las demás categorías ya forman parte del producto, no de una fase posterior.
 Usuario
-Registro, verificación de email e inicio de sesión
-Búsqueda por fecha, número de invitados, precio y capacidad
-Ficha del salón con fotos, precios y calendario de disponibilidad
-Agendar visita al salón
-Apartar fecha con anticipo reembolsable (7 días), con tarjeta y OXXO/SPEI
-Cancelación e historial de reservas
+Registro (email, Google, Facebook), verificación de email y teléfono, e inicio de sesión
+Búsqueda por fecha, número de invitados, precio y capacidad, en 7 categorías
+Armador de fiesta completa o reserva de servicios por separado (toda reserva pertenece a un evento)
+Ficha del proveedor con fotos, precios y calendario de disponibilidad
+Chat, agendar visita y cotización personalizada
+Apartar fecha con un anticipo que fija el proveedor (20% a 50%, mínimo $500), reembolsable durante 7 días, con tarjeta, OXXO o SPEI
+Cancelación, reprogramación, reseñas e historial de reservas
+Invitaciones digitales con confirmación de asistencia (herramienta propia, no una categoría)
 Proveedor
 Registro y verificación manual
 Perfil, galería, catálogo y precios
-Calendario con turnos y bloqueo de fechas vendidas fuera de la app
+Calendario con turnos, sincronización con Google Calendar y bloqueo de fechas vendidas fuera de la app
 Prevención de doble reserva
-Panel para confirmar reservas y ver datos del cliente
+Panel de reservas (se confirman al instante; el proveedor puede cancelar sin penalización en las primeras 24 h), datos del cliente y calificación al cliente
+Ingresos, estadísticas y planes (gratuito y Premium)
 Administración
-Aprobación de proveedores, vista de reservas y reembolsos manuales
-Fuera del MVP: chat propio, reseñas, armador de fiesta completa, planes premium, CFDI al usuario final, dashboards financieros y otras categorías de proveedores.
-La especificación completa (requisitos `RF-XXX`) está en `docs/`.
+Aprobación de proveedores, vista de reservas, disputas y reembolsos
+Finanzas, moderación de contenido, cupones, banners y configuración
+La especificación completa (requisitos `RF-XXX`) está en `Documentos/`.
 Stack
 Capa	Tecnología
 Frontend	React + TypeScript (PWA)
 Backend y base de datos	Supabase (PostgreSQL, Auth, Storage)
-Pagos	Mercado Pago o Stripe Connect con pagos divididos — por definir
-Emails transaccionales	Por definir
+Pagos	Una sola pasarela con pagos divididos en la primera versión: Stripe Connect o Conekta, por elegir tras compararlas en modo de prueba. Mercado Pago descartado
+Emails transaccionales	Por definir (requiere el dominio propio, que se compra al inicio de la Fase 1)
 Hosting frontend	Por definir (Vercel o Netlify)
 Reglas técnicas
 La autenticación se maneja con Supabase Auth; no se implementa login a mano.
-ORGANICE no retiene dinero de proveedores: los pagos se dividen en la pasarela.
+ORGANICE no retiene dinero de proveedores: los pagos se dividen en la pasarela, que también libera la parte del proveedor 24 a 48 horas después del evento.
 Nunca se guardan datos de tarjetas.
 Estructura del repositorio
 > Estructura propuesta; se ajustará al crear el proyecto.
@@ -82,12 +85,13 @@ VITE_SUPABASE_ANON_KEY=
 Flujo de una reserva
 Estados previstos de una reserva (se definirán a detalle antes de programar):
 ```
-pendiente ──► confirmada ──► anticipo pagado ──► completada
-    │              │                │
-    └──► expirada  └──► cancelada ◄─┘
+confirmada ──► anticipo pagado ──► pagada ──► completada
+    │                │              │
+    ├──► expirada    └──► cancelada ◄┘      (además: reprogramada)
+    └──► cancelada
 ```
-Pendiente: el usuario solicitó el apartado; el proveedor debe confirmar.
-Expirada: el proveedor no confirmó a tiempo o el usuario no pagó el anticipo.
+Confirmada: la fecha estaba libre, así que la reserva se confirma al instante. El proveedor tiene 24 horas para cancelar sin penalización.
+Expirada: el usuario no pagó el anticipo a tiempo.
 Cancelada: con o sin reembolso, según la política.
 Completada: el evento ya ocurrió.
 Forma de trabajo
@@ -111,11 +115,13 @@ Tareas pequeñas, una por requisito.
 Pedir pruebas automáticas para todo lo relacionado con reservas y pagos.
 Roadmap
 Fase	Objetivo	Estado
-0 – Validación	Entrevistas con usuarios y proveedores; MVP a mano	🟡 En curso
-1 – MVP	Salones: buscar, agendar visita y apartar	⚪ Pendiente
-2 – Piloto	Lanzamiento cerrado en Tepic	⚪ Pendiente
-3 – Crecimiento	Más categorías, armador de fiesta completa, reseñas, chat	⚪ Pendiente
-El plan detallado está en el documento maestro del proyecto (Google Docs).
+0 – Preparación	Decisiones pendientes, cuentas, trámites y entrevistas con salones y proveedores	🟡 En curso
+1 – Cimientos compartidos	Proyecto base, modelo de base de datos, seguridad, contratos, autenticación y sistema de diseño (incluye comprar el dominio)	⚪ Pendiente
+2 – Desarrollo en paralelo	Bloques A1 a A8 (organizador y transacciones) y B1 a B9 (proveedor, administración y plataforma)	⚪ Pendiente
+3 – Integración y calidad	Pruebas completas, seguridad, accesibilidad, rendimiento y compatibilidad	⚪ Pendiente
+4 – Legal, fiscal y operación	Figura legal, RFC, PAC, avisos legales y proveedores fundadores (en paralelo desde la Fase 0)	⚪ Pendiente
+5 – Beta cerrada y lanzamiento	Beta en Tepic con salones y proveedores fundadores, y después lanzamiento público	⚪ Pendiente
+El plan detallado está en la Guía de desarrollo v2 (`Documentos/`).
 Equipo
 Ricardo
 Nicolás

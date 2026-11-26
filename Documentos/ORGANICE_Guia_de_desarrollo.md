@@ -1,6 +1,6 @@
 # ORGANICE – Guía de desarrollo del producto completo (v2)
 
-*Equipo: Ricardo y Nicolás · Referencia: Especificación Funcional (RF-001 a RF-119) · Sustituye al documento v1 (enfoque MVP)*
+*Equipo: Ricardo y Nicolás · Referencia: Especificación Funcional (RF-001 a RF-121) · Sustituye al documento v1 (enfoque MVP)*
 
 ## Índice
 
@@ -39,7 +39,7 @@ Esta guía dice qué hacer, en qué orden y quién lo hace. El trabajo se divide
 
 ## 1. Resumen y alcance
 
-ORGANICE se construirá como producto completo: los 119 requisitos de la especificación, agrupados en 5 módulos (Autenticación, Usuarios finales, Proveedores, Administración y Backend/Sistema). El desarrollo lo hace Claude Code, dirigido, revisado y probado por el equipo.
+ORGANICE se construirá como producto completo: los 121 requisitos de la especificación, agrupados en 5 módulos (Autenticación, Usuarios finales, Proveedores, Administración y Backend/Sistema). El desarrollo lo hace Claude Code, dirigido, revisado y probado por el equipo.
 
 **Recomendación:** aunque el producto salga completo, antes de abrirlo al público conviene una beta cerrada (Fase 5) con salones reales de Tepic. Es la forma más barata de encontrar errores en pagos y reservas antes de que los encuentre un cliente.
 
@@ -67,7 +67,9 @@ Crear, confirmar, cancelar y reprogramar reservas se hace con funciones de Postg
 
 ### ADR-004 · Pagos con adaptador y pagos divididos — Propuesta
 
-Una interfaz única `PaymentProvider` con dos implementaciones: Stripe Connect (RF-105) y Conekta (RF-106). Con Stripe Connect el dinero se divide en la pasarela y la retención post-evento (RF-075) la maneja la pasarela, sin que el dinero pase por la cuenta de ORGANICE.
+Una interfaz única `PaymentProvider`, preparada para dos implementaciones: Stripe Connect (RF-105) y Conekta (RF-106). **La primera versión usa una sola pasarela** y la otra se agrega después con el mismo adaptador. El dinero se divide en la pasarela y la parte del proveedor se libera 24 a 48 horas después del evento mediante pago diferido (RF-075), sin que el dinero pase por la cuenta de ORGANICE. Mercado Pago queda descartado.
+
+**Cómo se elige (decisión del 04/11/2026):** abrir cuentas de prueba en ambas y comparar pagos divididos, OXXO, SPEI, meses sin intereses y pago diferido. Gana la que cubra mejor esos cinco puntos.
 
 **Pendiente:** confirmar requisitos fiscales de Stripe Connect y Conekta en México (requieren RFC y figura legal).
 
@@ -102,7 +104,7 @@ El reparto está pensado para que cada track tenga sus propias pantallas, carpet
 ### Track B — Proveedor, administración y plataforma
 
 - **Enfoque:** todo lo que ve y hace el proveedor y el administrador, más notificaciones y servicios de plataforma.
-- **Requisitos:** RF-002, 003, 005, 008, 010 a 012, RF-022 a 024, RF-044, RF-056 a 067, RF-069 a 104, RF-109, 111, 112, 114, 115, 118, 119.
+- **Requisitos:** RF-002, 003, 005, 008, 010 a 012, RF-022 a 024, RF-044, RF-056 a 067, RF-069 a 104, RF-109, 111, 112, 114, 115, 118, 119, RF-120, RF-121.
 - **Carpetas propias:** `src/features/{provider, admin, notifications, account, media, subscriptions}`
 - **Tablas propias:** `providers, services, prices, media, availability, subscriptions, payouts, claims, notifications, coupons, categories, banners, audit_logs`
 
@@ -127,7 +129,7 @@ El reparto está pensado para que cada track tenga sus propias pantallas, carpet
 - **`notify(usuario, tipo, datos)`** — crea una notificación; B decide el canal (email, push, SMS, WhatsApp). *Dueño:* B · *Lo usa:* A, B.
 - **`get_provider_public(provider)`** — datos públicos del proveedor para búsqueda y ficha. *Dueño:* B · *Lo usa:* A.
 - **`providers.payment_account_id`** — cuenta de pago del proveedor (Stripe Connect / Conekta). *Dueño:* B (alta) · *Lo usa:* A (cobros divididos).
-- **Estados de reserva** — pendiente → confirmada → anticipo pagado → pagada → completada; expirada; cancelada; reprogramada. *Dueño:* A · *Lo usa:* Ambos.
+- **Estados de reserva** — confirmada → anticipo pagado → pagada → completada; expirada; cancelada (usuario o proveedor, dentro o fuera de las 24 h); reprogramada. Ya no existe "pendiente". *Dueño:* A · *Lo usa:* Ambos.
 
 ---
 
@@ -157,7 +159,7 @@ CI en GitHub Actions: lint, tipos y pruebas en cada PR; despliegues de vista pre
 *Terminado cuando:* un PR de prueba pasa la CI y genera vista previa.
 
 **1.3 — Modelo de base de datos** · Responsable: Ambos
-Modelo completo de base de datos (todas las tablas de los 119 RF) y diagrama.
+Modelo completo de base de datos (todas las tablas de los 121 RF) y diagrama.
 *Terminado cuando:* diagrama aprobado y migraciones aplicadas en Supabase.
 
 **1.4 — Seguridad por fila (RLS)** · Responsable: Ambos
@@ -203,7 +205,7 @@ Restricción de exclusión; funciones reales de reserva (reemplazan las simulada
 *Terminado cuando:* pruebas de doble reserva simultánea pasan; todos los estados funcionan.
 
 **A3 · Pagos** — RF-105, 106, 107, 031, 033, 034, 035
-Adaptador `PaymentProvider`; Stripe Connect; Conekta; anticipo; saldo; MSI; OXXO y SPEI; webhooks; reintentos.
+Adaptador `PaymentProvider`; la pasarela elegida (Stripe Connect o Conekta); anticipo; saldo; MSI; OXXO y SPEI; pago diferido al proveedor; webhooks; reintentos.
 *Terminado cuando:* pago de prueba dividido entre proveedor y ORGANICE con cada método.
 
 **A4 · Armador de fiesta** — RF-027, 028, 029, 030, 025
@@ -236,9 +238,9 @@ Registro de proveedor; carga de documentos; editor de perfil; galería; videos; 
 Calendario con turnos; bloqueo manual (`block_dates`); sincronización con Google Calendar y otros (iCal).
 *Terminado cuando:* un evento de Google Calendar bloquea la fecha en ORGANICE.
 
-**B3 · Reservas del proveedor** — RF-069, 070, 071, 072, 044
-Panel de reservas entrantes; confirmar/rechazar (usa `confirm_booking`); detalle del cliente; modificar reserva; responder reseñas.
-*Terminado cuando:* el proveedor confirma una reserva de los datos de prueba.
+**B3 · Reservas del proveedor** — RF-069, 070, 071, 072, 044, 120, 121
+Panel de reservas (confirmadas al instante, con cuenta regresiva de 24 h); cancelar con o sin penalización (usa `cancel_booking`); detalle del cliente con su calificación; modificar reserva; responder reseñas; calificar al cliente; tasa de cancelación y multas.
+*Terminado cuando:* el proveedor cancela una reserva de los datos de prueba dentro de las 24 h sin penalización y fuera de ellas con penalización, y califica a un cliente.
 
 **B4 · Notificaciones** — RF-101, 102, 103, 104
 Implementar `notify` con email, push, SMS y WhatsApp; plantillas; preferencias por usuario.
@@ -270,7 +272,7 @@ Aviso de privacidad, cookies y derechos ARCO; respaldos; auditoría; CDN; optimi
 
 Son los únicos momentos en que se prueban juntos. Si uno llega antes, sigue con su siguiente bloque.
 
-- **I-1 Reservas** — al terminar A2 y B3: usuario aparta → proveedor confirma → usuario ve el cambio.
+- **I-1 Reservas** — al terminar A2 y B3: usuario aparta → la reserva queda confirmada al instante → el proveedor la ve y puede cancelarla dentro de 24 h → usuario ve el cambio.
 - **I-2 Dinero** — al terminar A3 y B5: pago dividido a la cuenta real del proveedor; plan premium cambia la comisión a 4%.
 - **I-3 Notificaciones** — al terminar A5 y B4: cada evento de reserva, pago y chat notifica por el canal correcto.
 - **I-4 Operación** — al terminar A6 y B6: reseñas moderadas; disputas y reembolsos de punta a punta.
@@ -288,7 +290,8 @@ Son los únicos momentos en que se prueban juntos. Si uno llega antes, sigue con
 
 ### Fase 4 – Legal, fiscal y operación (en paralelo desde la Fase 0)
 
-- [ ] **Registrar la marca en el IMPI y comprar dominio** — proteger el nombre. *Necesario antes de:* Beta.
+- [ ] **Comprar el dominio propio** — lo piden el correo transaccional, el login con Google y Facebook y WhatsApp Business. *Necesario antes de:* configurar esos servicios, es decir, al inicio de la Fase 1.
+- [ ] **Registrar la marca en el IMPI** — proteger el nombre. *Necesario antes de:* Beta.
 - [ ] **Definir figura legal y RFC** (persona física con actividad empresarial o S.A.S.) — Stripe, Conekta y el PAC la piden. *Necesario antes de:* Integración I-2.
 - [ ] **Contratar PAC para CFDI 4.0** y definir quién factura qué (comisión vs. servicio del proveedor) — RF-036 y RF-092. *Necesario antes de:* Bloque A6.
 - [ ] **Aviso de privacidad, términos y condiciones, política de cookies** (revisados por abogado) — LFPDPPP. *Necesario antes de:* Beta.
@@ -349,7 +352,8 @@ Son los únicos momentos en que se prueban juntos. Si uno llega antes, sigue con
 - [ ] Compatibilidad cross-browser y celulares reales
 
 **Fase 4**
-- [ ] IMPI y dominio
+- [ ] Dominio (al inicio de la Fase 1)
+- [ ] Registro de marca en el IMPI
 - [ ] Figura legal y RFC
 - [ ] PAC
 - [ ] Documentos legales
@@ -371,5 +375,7 @@ Son los únicos momentos en que se prueban juntos. Si uno llega antes, sigue con
 - ¿Quién toma el Track A y quién el Track B?
 - ¿Cuántas horas por semana puede dedicar cada uno?
 - ¿Con qué figura legal y RFC se darán de alta en Stripe, Conekta y el PAC?
+- ¿El pago diferido de la parte del proveedor (RF-075) requiere algún permiso? Confirmarlo con un abogado antes de la Integración I-2.
+- ¿Qué pasarela gana la comparación en modo de prueba (Stripe Connect o Conekta)?
 - ¿Quién emite la factura del servicio del proveedor: el proveedor con su propio RFC o solo se factura la comisión de ORGANICE?
 - ¿Hay fecha objetivo de lanzamiento o de algún concurso?
