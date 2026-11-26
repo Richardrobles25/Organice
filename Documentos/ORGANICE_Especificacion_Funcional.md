@@ -3,7 +3,9 @@
 *Documento de referencia para desarrollo del sistema*
 **Marketplace de servicios para eventos y fiestas**
 
-Autor: Nicolás · Tepic, Nayarit · Abril 2026 · *Versión 1.0*
+Autor: Nicolás · Tepic, Nayarit · Abril 2026 · *Versión 1.1 (actualizada el 04/11/2026)*
+
+> **Cambios de la versión 1.1:** se resolvieron contradicciones con CLAUDE.md y la Guía v2: monto y reembolso del anticipo (RF-031, RF-037), pago diferido en lugar de retención (RF-074, RF-075), tarifa de servicio al usuario (RF-095), pago en efectivo solo por OXXO y sin Mercado Pago (RF-035), contacto del proveedor solo tras apartar (RF-020, RF-042), categorías con Pastelería (RF-014), reserva de un solo servicio como evento (RF-027, RF-031, RF-047), pasarela única en la primera versión (RF-105, RF-106) y seguridad delegada a Supabase Auth (RF-001, RF-108).
 
 > 💡 **Cómo usar este documento:** cada funcionalidad tiene un ID único (RF-XXX). Cuando estés desarrollando, puedes referirte a ellos directamente en tu tablero de tareas, commits o documentación técnica.
 
@@ -12,7 +14,7 @@ Autor: Nicolás · Tepic, Nayarit · Abril 2026 · *Versión 1.0*
 1. [Introducción](#1-introducción)
 2. [Módulo de Autenticación y Cuentas](#2-módulo-de-autenticación-y-cuentas) — RF-001 a RF-012
 3. [Módulo de Usuarios Finales (Organizadores)](#3-módulo-de-usuarios-finales-organizadores) — RF-013 a RF-055
-4. [Módulo de Proveedores](#4-módulo-de-proveedores) — RF-056 a RF-081
+4. [Módulo de Proveedores](#4-módulo-de-proveedores) — RF-056 a RF-081, RF-120 y RF-121
 5. [Módulo de Administración (Backoffice)](#5-módulo-de-administración-backoffice) — RF-082 a RF-100
 6. [Funcionalidades del Sistema (Backend)](#6-funcionalidades-del-sistema-backend) — RF-101 a RF-119
 7. [Requerimientos No Funcionales](#7-requerimientos-no-funcionales)
@@ -29,7 +31,7 @@ Este documento describe TODAS las funcionalidades que debe tener la plataforma O
 
 ### 1.2 Alcance del sistema
 
-ORGANICE es un marketplace digital que conecta a personas que organizan eventos sociales (XV años, bodas, cumpleaños, bautizos) con proveedores locales (salones, catering, espectáculos, mobiliario, decoración, fotografía, invitaciones digitales). Su valor diferencial es el "Armador de Fiesta Completa": el usuario puede reservar todos los elementos de su evento sincronizados por fecha en un solo flujo.
+ORGANICE es un marketplace digital que conecta a personas que organizan eventos sociales (XV años, bodas, cumpleaños, bautizos) con proveedores locales (salones, catering, espectáculos, mobiliario, decoración, fotografía, pastelería). Su valor diferencial es el "Armador de Fiesta Completa": el usuario puede reservar todos los elementos de su evento sincronizados por fecha en un solo flujo. El Armador es opcional: cada servicio también se puede buscar y reservar por separado. Las invitaciones digitales (RF-049 a RF-055) son una herramienta propia de ORGANICE, no una categoría de proveedores.
 
 ### 1.3 Tipos de usuarios del sistema
 
@@ -59,7 +61,7 @@ Todas las funcionalidades relacionadas con el registro, inicio de sesión y gest
 - Formulario con campos: nombre completo, email, contraseña, confirmación de contraseña.
 - Validación de email en formato correcto y que no esté ya registrado.
 - Validación de contraseña: mínimo 8 caracteres, al menos una mayúscula, un número.
-- Encriptación de contraseña con bcrypt o argon2 antes de guardar en base de datos.
+- La contraseña se protege con el hash que aplica Supabase Auth; no se implementa a mano.
 - Envío automático de email de verificación al registrarse.
 - El usuario no puede reservar hasta que verifique su email.
 - Aceptación explícita de términos y condiciones (checkbox obligatorio).
@@ -194,6 +196,7 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 *Explorar servicios agrupados por tipo (salones, comida, espectáculos, etc.).*
 
 - Página de categoría principal con las 7 categorías (salones, catering, espectáculos, mobiliario, decoración, fotografía, pastelería).
+- Las invitaciones digitales no son una categoría de proveedores: son una herramienta propia (RF-049 a RF-055) que se abre desde "Mis eventos".
 - Icono representativo y foto atractiva para cada categoría.
 - Contador de proveedores disponibles por categoría.
 - Filtros específicos por categoría (ej: en catering se muestran opciones de tipo de comida).
@@ -258,7 +261,7 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 - Servicios incluidos y adicionales.
 - Políticas de reserva, cancelación, anticipo.
 - Reseñas y calificación promedio.
-- Información de contacto (WhatsApp, teléfono) — solo visible tras reservar o pedir cotización.
+- Información de contacto (WhatsApp, teléfono) — solo visible después de apartar. Antes de apartar, la comunicación es por el chat interno (RF-039).
 - Ubicación en mapa.
 - Badge de verificación si es proveedor premium.
 - Botón principal de acción: "Ver disponibilidad y reservar".
@@ -327,6 +330,7 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 - Posibilidad de saltar pasos y regresar.
 - Guardado automático del progreso (por si abandona y regresa).
 - Al final: resumen visual completo del evento y precio total.
+- Armar la fiesta completa es opcional: cada servicio también se puede reservar por separado (RF-031). El Armador solo agrega servicios a un mismo evento.
 
 #### RF-028 — Checklist inteligente por tipo de evento
 
@@ -361,18 +365,23 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 *Reservar un servicio pagando solo un porcentaje (ej: 30%).*
 
 - Formulario de reserva: fecha, hora, cantidad, notas especiales.
-- Cálculo automático del anticipo según política del proveedor (20-50%).
-- Método de pago: tarjeta de crédito/débito (Stripe/Conekta).
-- Confirmación por email y notificación al proveedor.
+- Cálculo automático del anticipo: porcentaje que define el proveedor (20% a 50% del precio del servicio), con un mínimo de $500 MXN.
+- El anticipo es reembolsable en su totalidad si el usuario cancela dentro de los 7 días siguientes al pago.
+- Toda reserva pertenece a un evento. Si el usuario aparta un solo servicio, el sistema crea automáticamente un evento con ese servicio, y después puede agregar más servicios para la misma fecha (con el Armador o desde "Mis eventos").
+- Si la tarifa de servicio al usuario está activa (RF-095), se muestra como "Tarifa de servicio ORGANICE" en el resumen de pago.
+- Método de pago: tarjeta de crédito/débito, mediante la pasarela elegida (ver RF-105 y RF-106).
+- Si la fecha y el turno están libres, la reserva queda **confirmada al instante**, sin esperar la aprobación del proveedor (ver RF-070).
+- Confirmación por email y notificación inmediata al proveedor.
 - Comprobante descargable en PDF.
 
 #### RF-032 — Reserva sin pago (solo apartar)
 
-*Reservar sin pagar aún, con confirmación posterior del proveedor.*
+*Apartar la fecha sin pagar aún; la reserva queda confirmada al instante.*
 
-- Estado inicial "Pendiente de confirmación".
-- Proveedor tiene 24-48 horas para aceptar o rechazar.
-- Si acepta, el usuario tiene 24 horas para pagar el anticipo.
+- Si la fecha y el turno están libres, la reserva queda en estado "Confirmada" de inmediato (no hay estado "pendiente de aceptar").
+- La fecha queda bloqueada para otros usuarios.
+- El usuario tiene 24 horas para pagar el anticipo. Si no paga, la reserva pasa a "Expirada" y la fecha se libera.
+- Mientras corra la ventana de cancelación del proveedor (RF-070), el usuario ve el aviso "El proveedor puede cancelar sin costo en las primeras 24 horas".
 
 #### RF-033 — Pago del saldo restante
 
@@ -397,8 +406,8 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 
 - OXXO Pay (código para pagar en tienda).
 - SPEI (transferencia bancaria).
-- Mercado Pago.
-- Pago en efectivo directo con el proveedor (con confirmación posterior).
+- El pago en efectivo se hace solo por OXXO Pay. No se permite pagar en efectivo directamente al proveedor, porque el pago siempre pasa por la plataforma.
+- Mercado Pago queda fuera del alcance.
 
 #### RF-036 — Facturación electrónica (CFDI 4.0)
 
@@ -417,6 +426,7 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 - Botón "Cancelar reserva" visible.
 - Muestra claramente la política de cancelación aplicable.
 - Cálculo automático del reembolso según días de anticipación.
+- Dentro de los 7 días posteriores al pago del anticipo el reembolso es total (ver RF-031).
 - Notificación inmediata al proveedor.
 - Reembolso procesado a los 5-10 días hábiles.
 
@@ -467,6 +477,7 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 - El proveedor recibe la solicitud y responde con propuesta.
 - Cotización con validez limitada (7-15 días).
 - El usuario puede aceptar la cotización y convertirla en reserva.
+- Las cotizaciones se responden por el chat interno (RF-039). El contacto del proveedor no se revela hasta que el usuario aparte.
 
 ### 3.6 Reseñas y calificaciones
 
@@ -480,6 +491,7 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 - Comentario en texto libre (mínimo 20 caracteres, máximo 500).
 - Subir hasta 5 fotos del evento (opcional).
 - Solo puede reseñar si tuvo una reserva confirmada y pagada.
+- Reseña "a ciegas": la reseña del usuario y la calificación del proveedor al cliente (RF-120) se publican al mismo tiempo, cuando ambas partes ya calificaron o a los 14 días, lo que ocurra primero.
 
 #### RF-044 — Responder a reseñas
 
@@ -512,7 +524,7 @@ Todas las funcionalidades diseñadas para las personas que buscan organizar un e
 
 *Vista unificada donde el usuario ve TODOS sus eventos organizados (múltiples reservas relacionadas).*
 
-- Agrupa reservas del mismo evento (salón + comida + música = 1 evento).
+- Agrupa reservas del mismo evento (salón + comida + música = 1 evento). Un evento puede tener un solo servicio.
 - Countdown al día del evento.
 - Checklist de tareas pendientes.
 - Chat unificado con todos los proveedores del evento.
@@ -724,6 +736,7 @@ Todas las funcionalidades diseñadas para los negocios que ofrecen servicios en 
 
 - Bloqueo automático al confirmar una reserva.
 - Lock temporal (15 minutos) al iniciar proceso de reserva.
+- Como la confirmación es instantánea, la fecha se bloquea en el mismo momento en que se crea la reserva.
 - Manejo de concurrencia en base de datos.
 
 ### 4.4 Gestión de reservas del proveedor
@@ -732,19 +745,22 @@ Todas las funcionalidades diseñadas para los negocios que ofrecen servicios en 
 
 *Dashboard con todas las reservas por atender.*
 
-- Vista de: pendientes de confirmar, confirmadas, canceladas, pagadas.
+- Vista de: confirmadas (con cuenta regresiva de la ventana de 24 h para cancelar sin penalización), canceladas, pagadas, completadas.
 - Filtros por fecha, estado, categoría.
 - Detalles de cada reserva: cliente, fecha, monto, notas.
-- Botones de acción: confirmar, rechazar, contactar cliente.
+- Botones de acción: cancelar (según RF-070 y RF-121), contactar cliente.
 
-#### RF-070 — Confirmación de reservas
+#### RF-070 — Reserva confirmada al instante y ventana de cancelación
 
-*Aprobar o rechazar una reserva pendiente.*
+*La reserva se confirma sola si la fecha está libre; el proveedor tiene 24 horas para cancelar sin penalización.*
 
-- Notificación inmediata al proveedor al recibir una reserva nueva.
-- Tiempo máximo para responder: 24-48 horas configurable.
-- Al confirmar: notificación al usuario y bloqueo de calendario.
-- Al rechazar: motivo obligatorio, notificación al usuario, sugerencia de alternativas.
+- Si la fecha y el turno del proveedor están libres, la reserva queda "Confirmada" al instante, con bloqueo de calendario automático.
+- Notificación inmediata al proveedor por todos sus canales al recibir una reserva nueva.
+- Durante las 24 horas siguientes a la confirmación, el proveedor puede cancelar sin penalización. Para cancelar debe dar un motivo obligatorio.
+- Pasadas las 24 horas, cancelar tiene penalización (ver RF-121).
+- Cuando el proveedor cancela: reembolso del 100% al usuario, notificación inmediata y sugerencia de proveedores similares disponibles en esa fecha.
+- En el lanzamiento la reserva instantánea es obligatoria para todos los proveedores. Una modalidad opcional "con aprobación" queda como mejora futura, si los salones la piden.
+- Como la reserva se confirma sin intervención del proveedor, el calendario debe estar al día: bloqueo manual o sincronización con Google Calendar (RF-065).
 
 #### RF-071 — Ver detalles del cliente
 
@@ -753,6 +769,7 @@ Todas las funcionalidades diseñadas para los negocios que ofrecen servicios en 
 - Nombre, teléfono verificado, email.
 - Historial en la plataforma (cuántas reservas ha hecho).
 - Notas del cliente sobre la reserva.
+- Calificación promedio del cliente dada por otros proveedores (ver RF-120).
 - Datos de facturación si los requiere.
 
 #### RF-072 — Modificar reserva existente
@@ -762,6 +779,30 @@ Todas las funcionalidades diseñadas para los negocios que ofrecen servicios en 
 - Modificar hora, cantidad de invitados, notas.
 - Requiere aprobación del cliente si cambia condiciones importantes.
 - Registro de cambios (audit trail).
+
+#### RF-120 — Calificar al cliente
+
+*Después del evento, el proveedor califica al cliente, como en Uber o Airbnb.*
+
+- Solicitud automática al proveedor 1 día después del evento (por email y push), solo para reservas completadas.
+- Calificación de 1-5 estrellas.
+- Categorías: puntualidad en pagos, trato y respeto, cumplimiento de acuerdos (horarios, número de invitados, cuidado del lugar).
+- Comentario opcional (máximo 300 caracteres).
+- La calificación es visible solo para otros proveedores (en RF-071) y para administración; nunca es pública. El cliente ve únicamente su promedio general, no los comentarios de cada proveedor.
+- Calificación "a ciegas": se publica al mismo tiempo que la reseña del usuario (RF-043), cuando ambos calificaron o a los 14 días.
+- El cliente puede reportar una calificación injusta; administración la revisa en RF-093.
+- Una calificación baja no bloquea automáticamente al cliente. Administración decide si suspende o advierte.
+
+#### RF-121 — Cancelación del proveedor y penalizaciones
+
+*Qué pasa cuando un proveedor cancela una reserva ya confirmada.*
+
+- Dentro de las 24 horas posteriores a la confirmación: sin multa y sin pérdida de visibilidad por esa cancelación individual.
+- Después de las 24 horas: multa y baja de visibilidad en la búsqueda. **Monto de la multa: por definir** (propuesta: 10% del precio de la reserva, descontado de su siguiente pago).
+- Se calcula la tasa de cancelación de cada proveedor (todas las cancelaciones, incluso las gratuitas). Si supera un umbral configurable (por definir), baja su posición en el ranking.
+- La tasa de cancelación se usa internamente para el ranking, nunca como etiqueta pública (mismo criterio que la tasa de cierre).
+- Cancelaciones repetidas pueden llevar a advertencia o suspensión, decididas por administración.
+- Toda cancelación del proveedor genera reembolso del 100% al usuario y queda en el registro de auditoría.
 
 ### 4.5 Ingresos y pagos al proveedor
 
@@ -777,7 +818,7 @@ Todas las funcionalidades diseñadas para los negocios que ofrecen servicios en 
 
 #### RF-074 — Configuración de cuenta bancaria
 
-*Datos para recibir depósitos de ORGANICE.*
+*Datos para recibir los depósitos de la pasarela de pagos.*
 
 - CLABE interbancaria.
 - Banco y titular.
@@ -786,10 +827,11 @@ Todas las funcionalidades diseñadas para los negocios que ofrecen servicios en 
 
 #### RF-075 — Retiros y pagos automáticos
 
-*ORGANICE deposita al proveedor tras el evento.*
+*El proveedor recibe su parte después del evento, sin que ORGANICE retenga el dinero.*
 
-- Retención de fondos hasta 24-48 horas post-evento.
-- Depósito automático semanal (viernes) o quincenal (elegible).
+- La pasarela divide cada pago en el momento del cobro: la parte del proveedor y la comisión de ORGANICE quedan separadas. ORGANICE no custodia el dinero del proveedor.
+- Pago diferido: la pasarela libera la parte del proveedor entre 24 y 48 horas después del evento.
+- Depósito semanal (viernes) o quincenal, a elección del proveedor, configurado como calendario de pagos de su cuenta en la pasarela.
 - Comprobante de depósito por email.
 - Historial completo de pagos.
 
@@ -973,7 +1015,7 @@ Panel interno para el equipo de ORGANICE (Nicolás y colaboradores) para operar 
 
 *Revisar y aprobar reseñas reportadas.*
 
-- Cola de reseñas reportadas.
+- Cola de reseñas reportadas, incluidas las calificaciones de proveedores a clientes (RF-120).
 - Ver contexto: reserva, comunicación previa, historial del usuario.
 - Acciones: mantener, editar, eliminar.
 
@@ -991,8 +1033,8 @@ Panel interno para el equipo de ORGANICE (Nicolás y colaboradores) para operar 
 
 *Ajustes globales del sistema.*
 
-- Comisión por defecto.
-- Fee al usuario (activable).
+- Comisión por defecto: 7% al proveedor del plan gratuito y 4% al del plan Premium.
+- Tarifa de servicio al usuario (activable): 3%. Arranca en 0% durante la beta cerrada y se activa en el lanzamiento público. Se muestra como "Tarifa de servicio ORGANICE" en el resumen de pago.
 - Precio del Plan Premium.
 - Políticas de cancelación por defecto.
 - Datos de contacto de soporte.
@@ -1091,6 +1133,7 @@ Capacidades técnicas del sistema que no son visibles al usuario pero son críti
 
 *Procesamiento de pagos con tarjeta.*
 
+- Candidata a pasarela única de la primera versión. La elegida se decide comparando Stripe y Conekta en modo de prueba (pagos divididos, OXXO, SPEI, meses sin intereses y pago diferido); la otra se integra después con el mismo adaptador (ver ADR-004 de la Guía).
 - Stripe Payment Intents API.
 - Soporte 3D Secure (obligatorio en México).
 - Webhooks para eventos de pago.
@@ -1100,6 +1143,7 @@ Capacidades técnicas del sistema que no son visibles al usuario pero son críti
 
 *Pasarela local mexicana con métodos alternativos.*
 
+- Candidata a pasarela única de la primera versión (ver RF-105). Si no es la elegida, se integra después con el mismo adaptador.
 - OXXO Pay.
 - SPEI.
 - Tarjetas.
@@ -1121,9 +1165,9 @@ Capacidades técnicas del sistema que no son visibles al usuario pero son críti
 *Protección de información privada.*
 
 - HTTPS obligatorio en toda la plataforma (SSL/TLS).
-- Encriptación en base de datos para datos personales (AES-256).
-- Hashing de contraseñas con bcrypt/argon2.
-- Tokens JWT firmados para autenticación.
+- Cifrado en reposo de la base de datos (lo provee Supabase) y cifrado a nivel de campo para datos muy sensibles como RFC y CLABE.
+- Hash de contraseñas delegado a Supabase Auth; no se implementa a mano.
+- Tokens JWT emitidos y firmados por Supabase Auth.
 
 #### RF-109 — Cumplimiento LFPDPPP (México)
 
@@ -1286,7 +1330,7 @@ El sistema se construirá de forma completa, cubriendo todos los módulos descri
 
 - **Módulo 1: Autenticación y Cuentas** (RF-001 a RF-012) — Registro, login, verificación, recuperación de contraseña, 2FA y gestión de perfil.
 - **Módulo 2: Usuarios Finales** (RF-013 a RF-055) — Búsqueda, ficha de proveedor, Armador de Fiesta Completa, reservas y pagos, chat, reseñas, historial e invitaciones digitales.
-- **Módulo 3: Proveedores** (RF-056 a RF-081) — Registro, perfil de negocio, calendario, gestión de reservas, ingresos, analíticas y planes de suscripción.
+- **Módulo 3: Proveedores** (RF-056 a RF-081, RF-120 y RF-121) — Registro, perfil de negocio, calendario, gestión de reservas, calificación de clientes, ingresos, analíticas y planes de suscripción.
 - **Módulo 4: Administración (Backoffice)** (RF-082 a RF-100) — Gestión de usuarios, proveedores, reservas, finanzas, moderación de contenido, configuración y reportes.
 - **Módulo 5: Backend y Sistema** (RF-101 a RF-119) — Notificaciones, pagos, seguridad, performance, escalabilidad e integraciones.
 
@@ -1313,4 +1357,4 @@ Definiciones de términos técnicos y de negocio usados en este documento.
 
 *— Fin del documento —*
 
-**Total: 119 funcionalidades documentadas**
+**Total: 121 funcionalidades documentadas**
