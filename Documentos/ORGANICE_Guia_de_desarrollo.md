@@ -129,7 +129,7 @@ El reparto está pensado para que cada track tenga sus propias pantallas, carpet
 - **`notify(usuario, tipo, datos)`** — crea una notificación; B decide el canal (email, push, SMS, WhatsApp). *Dueño:* B · *Lo usa:* A, B.
 - **`get_provider_public(provider)`** — datos públicos del proveedor para búsqueda y ficha. *Dueño:* B · *Lo usa:* A.
 - **`providers.payment_account_id`** — cuenta de pago del proveedor (Stripe Connect / Conekta). *Dueño:* B (alta) · *Lo usa:* A (cobros divididos).
-- **Estados de reserva** — confirmada → anticipo pagado → pagada → completada; expirada; cancelada (usuario o proveedor, dentro o fuera de las 24 h); reprogramada. Ya no existe "pendiente". *Dueño:* A · *Lo usa:* Ambos.
+- **Estados de reserva** — (esperando pago, solo si el proveedor exige anticipo) → anticipo pagado; sin anticipo exigido: confirmada → anticipo pagado → pagada → completada; expirada; cancelada (usuario o proveedor, dentro o fuera de las 24 h). Ya no existen "pendiente" ni "reprogramada" (la reprogramación se guarda en el historial de cambios). *Dueño:* A · *Lo usa:* Ambos.
 
 ---
 
