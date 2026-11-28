@@ -1,0 +1,22 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="17.3096" height="23.2018" viewBox="0 0 17.3096 23.2018" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Gorro de cumplea&#195;&#177;os">
+<g id="cuerpo">
+<mask id="mask0_0_7" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="2" width="18" height="21">
+<path id="m&#195;&#161;scara" d="M8.6548 3.90182C11.8548 9.69182 14.5215 15.4818 16.6548 21.2718C11.3215 22.8158 5.98814 22.8158 0.654804 21.2718C2.78814 15.4818 5.4548 9.69182 8.6548 3.90182Z" fill="#E8467C" stroke="black"/>
+</mask>
+<g mask="url(#mask0_0_7)">
+<rect id="color base" x="0.654804" y="3.90182" width="16" height="21.23" fill="#E8467C"/>
+<rect id="raya" x="-4.46756" y="16.8654" width="28.8" height="2.024" transform="rotate(-28.6479 -4.46756 16.8654)" fill="#F9C74F"/>
+<rect id="raya_2" x="-4.46756" y="22.6554" width="28.8" height="2.024" transform="rotate(-28.6479 -4.46756 22.6554)" fill="#F9C74F"/>
+</g>
+</g>
+<circle id="pelusa" cx="10.4488" cy="3.06462" r="1.3156" fill="#F9C74F"/>
+<circle id="pelusa_2" cx="9.77334" cy="4.46723" r="1.3156" fill="#F9C74F"/>
+<circle id="pelusa_3" cx="8.2556" cy="4.81364" r="1.3156" fill="#F9C74F"/>
+<circle id="pelusa_4" cx="7.03847" cy="3.84301" r="1.3156" fill="#F9C74F"/>
+<circle id="pelusa_5" cx="7.03847" cy="2.28623" r="1.3156" fill="#F9C74F"/>
+<circle id="pelusa_6" cx="8.2556" cy="1.3156" r="1.3156" fill="#F9C74F"/>
+<circle id="pelusa_7" cx="9.77334" cy="1.66202" r="1.3156" fill="#F9C74F"/>
+<circle id="pomp&#195;&#179;n" cx="8.6548" cy="3.06462" r="1.794" fill="#FFE08A"/>
+</g>
+</svg>

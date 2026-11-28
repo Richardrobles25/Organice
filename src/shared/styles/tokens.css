@@ -1,0 +1,45 @@
+/* Cimiento 1.7 · Tokens tomados del Figma (pantallas finales, "versión clara"). */
+@font-face {
+  font-family: 'Organice Custom v2';
+  src: url('../assets/fonts/OrganiceCustom-v2-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --color-tinta: #17181a;
+  --color-secundario: #4b4d57;
+  --color-atenuado: #6b6d75;
+  --color-blanco: #ffffff;
+  --color-fondo-claro: #f7f7f8;
+  --color-borde: #e5e5e7;
+  --color-placeholder: #d9d9d9;
+  --color-beige: #e4e1d8;
+  --color-banner: #171717;
+
+  /* El color se reserva para disponibilidad y estados. */
+  --color-disponible: #2e9e5b;
+  --color-ocupado: #d93b3b;
+  --color-parcial: #e8a93d;
+  --color-no-disponible: #b5b7be;
+
+  /* Organice Custom solo en títulos grandes (un solo peso); Inter en todo lo demás. */
+  --fuente-titulo: 'Organice Custom v2', Georgia, serif;
+  --fuente-texto: 'Inter Variable', system-ui, sans-serif;
+
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 24px;
+  --espacio-6: 32px;
+  --espacio-7: 56px;
+  --espacio-8: 80px;
+
+  --radio-casilla: 6px;
+  --radio-campo: 14px;
+  --radio-tarjeta: 20px;
+  --radio-pildora: 999px;
+
+  --sombra-flotante: 0 6px 20px rgb(0 0 0 / 18%);
+}
