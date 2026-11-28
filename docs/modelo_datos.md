@@ -1,12 +1,12 @@
 # ORGANICE · Modelo de datos (cimiento 1.3)
 
-**Estado: aprobado por Nicolás y Ricardo (PR #3).** Las migraciones están en `supabase/migrations/`; todavía no se aplican al proyecto de Supabase en la nube.
+**Estado: aprobado por Nicolás y Ricardo (PR #3).** Las migraciones están en `supabase/migrations/` y ya están aplicadas en el proyecto de Supabase en la nube (OrganiceBD).
 
 76 tablas que cubren los 121 requisitos. Dueño **A** = Track A, **B** = Track B, **Compartida** = cambios solo con PR de ambos.
 
 ## Decisiones
 
-Tomadas por Nicolás (26/11/2026), falta el visto bueno de Ricardo:
+Tomadas por Nicolás y aprobadas por Ricardo (26/11/2026):
 
 1. **Varios eventos a la misma hora:** sí, con "recursos". Cada recurso es un lugar o equipo que se ocupa (un salón tiene 1; un catering con 2 equipos, 2).
 2. **Apartar sin pagar:** lo decide cada proveedor (`providers.requires_deposit_to_book`, por defecto exige anticipo). Sin pago, la fecha se bloquea 24 h; mientras se paga, 15 minutos. El contacto del proveedor se ve solo con el anticipo pagado.
