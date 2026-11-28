@@ -27,7 +27,7 @@ Decididos por Nicolás el 28/11/2026; Ricardo los aprueba al revisar el pull req
 - **No usar `select('*')`** en `providers`, `bookings`, `payments`, `resource_slots`, `provider_billing`, `billing_profiles`, `calendar_connections`, `api_keys` ni `webhooks`: hay columnas ocultas y la consulta fallaría. Pedir las columnas por nombre.
 - **No hay escritura directa** en reservas, pagos, reembolsos ni horarios. Llegan como funciones (contratos 1.5 y sus bloques).
 - **Cambios delicados del admin** (aprobar proveedores, moderar, reembolsar, suspender reseñas) también serán funciones que anoten en la bitácora, en los bloques B6 y B7.
-- Al registrarse una persona **todavía no se crea su perfil ni su rol**: es parte de la 1.6.
+- Al registrarse una persona, el trigger `on_auth_user_created` (1.6) crea su perfil, su rol (`usuario` o `proveedor`, nunca `admin`) y sus consentimientos con los datos que manda `signUp`. Ver `supabase/migrations/20261128000002_registro.sql`.
 
 ## Funciones disponibles
 
