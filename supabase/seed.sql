@@ -23,16 +23,24 @@ begin
     confirmation_token, recovery_token, email_change_token_new, email_change)
   values ('00000000-0000-0000-0000-000000000000', account_id, 'authenticated', 'authenticated', mail,
     extensions.crypt('Organice-Local1', extensions.gen_salt('bf')), now(),
-    '{"provider": "email", "providers": ["email"]}', '{}', now(), now(), '', '', '', '');
+    '{"provider": "email", "providers": ["email"]}',
+    -- Los mismos datos que manda la app al registrarse: el trigger de registro (1.6) crea el
+    -- perfil, el rol y los consentimientos.
+    jsonb_build_object('full_name', nombre, 'last_name', apellido,
+      'account_type', case when rol = 'proveedor' then 'proveedor' else 'usuario' end,
+      'terms_version', 'prueba', 'privacy_version', 'prueba'),
+    now(), now(), '', '', '', '');
   insert into auth.identities (provider_id, user_id, identity_data, provider, created_at, updated_at)
   values (account_id::text, account_id,
     jsonb_build_object('sub', account_id::text, 'email', mail, 'email_verified', true),
     'email', now(), now());
-  insert into public.profiles (id, full_name, last_name, phone)
-  values (account_id, nombre, apellido, '311555' || lpad((abs(hashtext(mail)) % 10000)::text, 4, '0'));
-  insert into public.user_roles (profile_id, role) values (account_id, rol);
-  insert into public.consents (profile_id, document, version) values
-    (account_id, 'terminos', 'prueba'), (account_id, 'privacidad', 'prueba');
+  update public.profiles
+    set phone = '311555' || lpad((abs(hashtext(mail)) % 10000)::text, 4, '0')
+    where id = account_id;
+  -- El registro nunca da 'admin': la cuenta de administración se cambia aquí.
+  if rol = 'admin' then
+    update public.user_roles set role = 'admin' where profile_id = account_id;
+  end if;
 end $$;
 
 -- ---------------------------------------------------------------- Cuentas
