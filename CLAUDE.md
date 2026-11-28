@@ -64,12 +64,9 @@ Requisitos: RF-002, 003, 005, 008, 010 a 012, RF-022 a 024, RF-044, RF-056 a 067
 
 ### Contratos compartidos (definidos en la Fase 1, en `docs/contratos.md`)
 
-- `check_availability(provider, fecha, turno)` — dueño: Track A
-- `create_booking / confirm_booking / cancel_booking / reschedule_booking` — dueño: Track A
-- `refund_booking(booking, monto, motivo)` — dueño: Track A
-- `block_dates(provider, fechas, origen)` — dueño: Track B
-- `notify(usuario, tipo, datos)` — dueño: Track B
-- `get_provider_public(provider)` — dueño: Track B
+- `check_availability`, `create_booking`, `confirm_booking` (solo el servidor, al llegar el anticipo), `cancel_booking`, `reschedule_booking`, `answer_reschedule`, `refund_booking` — dueño: Track A
+- `block_dates`, `unblock_dates`, `notify`, `get_provider_public` — dueño: Track B
+- Firmas y versión simulada en `src/shared/contracts/`. Al elegir varios días se crea una reserva por día y se pagan juntas
 - `providers.payment_account_id` — alta: Track B, lo usa Track A para cobros divididos
 - Estados de reserva: `confirmada → anticipo_pagado → pagada → completada`, además `expirada` y `cancelada` (con quién canceló: usuario o proveedor, y si fue dentro de las 24 h). Ya no existen los estados `pendiente` ni `reprogramada`: una reprogramación conserva el estado de la reserva y se guarda en `booking_changes`. Con proveedores que exigen anticipo, la reserva pasa por `esperando_pago` (15 minutos con tarjeta; hasta 24 h con OXXO o SPEI) y de ahí a `anticipo_pagado` o a `expirada`. Las 24 h del proveedor para cancelar empiezan cuando se recibe el pago. — dueño: Track A
 - `cancel_booking` registra quién cancela y calcula si cae dentro de la ventana de 24 h del proveedor; si el proveedor cancela fuera de ella, avisa a Track B para crear la penalización (`provider_penalties`)
