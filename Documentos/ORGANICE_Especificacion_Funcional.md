@@ -772,7 +772,7 @@ Todas las funcionalidades diseñadas para los negocios que ofrecen servicios en 
 
 *Información del cliente que hizo la reserva.*
 
-- Nombre, teléfono verificado, email.
+- Nombre. Teléfono verificado y email solo cuando el cliente ya pagó el anticipo.
 - Historial en la plataforma (cuántas reservas ha hecho).
 - Notas del cliente sobre la reserva.
 - Calificación promedio del cliente dada por otros proveedores (ver RF-120).
@@ -794,7 +794,7 @@ Todas las funcionalidades diseñadas para los negocios que ofrecen servicios en 
 - Calificación de 1-5 estrellas.
 - Categorías: puntualidad en pagos, trato y respeto, cumplimiento de acuerdos (horarios, número de invitados, cuidado del lugar).
 - Comentario opcional (máximo 300 caracteres).
-- La calificación es visible solo para otros proveedores (en RF-071) y para administración; nunca es pública. El cliente ve únicamente su promedio general, no los comentarios de cada proveedor.
+- La calificación la ven el proveedor que la escribió, los proveedores a quienes ese cliente ya les pagó un anticipo (en RF-071) y administración; nunca es pública. El cliente ve únicamente su promedio general, no los comentarios de cada proveedor.
 - Calificación "a ciegas": se publica al mismo tiempo que la reseña del usuario (RF-043), cuando ambos calificaron o a los 14 días.
 - El cliente puede reportar una calificación injusta; administración la revisa en RF-093.
 - Una calificación baja no bloquea automáticamente al cliente. Administración decide si suspende o advierte.
