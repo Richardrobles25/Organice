@@ -8,11 +8,11 @@ Marketplace que centraliza la organización de fiestas y eventos sociales (XV a�
 
 Las invitaciones digitales (RF-049 a RF-055) son una herramienta propia de ORGANICE, no una categoría de proveedores.
 
-**Se construye el producto completo**, no un MVP recortado: los 121 requisitos (`RF-001` a `RF-121`) de `docs/especificacion.md`, agrupados en 5 módulos (Autenticación, Usuarios finales, Proveedores, Administración, Backend/Sistema).
+**Se construye el producto completo**, no un MVP recortado: los 121 requisitos (`RF-001` a `RF-121`) de `Documentos/ORGANICE_Especificacion_Funcional.md`, agrupados en 5 módulos (Autenticación, Usuarios finales, Proveedores, Administración, Backend/Sistema).
 
 **Equipo:** Ricardo y Nicolás, estudiantes de Ingeniería en Sistemas del Tecnológico de Tepic. Tiempo limitado por la escuela. Dirigen, revisan y prueban todo lo que Claude Code programa.
 
-**Documento de referencia completo:** "ORGANICE – Guía de desarrollo del producto completo (v2)" en Google Docs. Contiene el roadmap por fases, el detalle de cada bloque de trabajo y los puntos de integración. Este `CLAUDE.md` resume lo que Claude Code necesita para programar; la guía es la fuente de verdad del plan.
+**Documento de referencia completo:** `Documentos/ORGANICE_Guia_de_desarrollo.md`. Contiene el roadmap por fases, el detalle de cada bloque de trabajo y los puntos de integración. Este `CLAUDE.md` resume lo que Claude Code necesita para programar; la guía es la fuente de verdad del plan.
 
 ## 2. Reglas de negocio (no negociables sin aprobación del equipo)
 
@@ -46,7 +46,24 @@ Las invitaciones digitales (RF-049 a RF-055) son una herramienta propia de ORGAN
 
 ## 4. Cómo está dividido el trabajo
 
-El trabajo se divide en dos tracks independientes para que ninguno espere al otro. Antes de dividir, hay una Fase 1 de cimientos compartidos (modelo de base de datos completo, contratos entre tracks con versión simulada, autenticación base, sistema de diseño).
+El trabajo se divide en dos tracks de bloques, programados contra contratos compartidos para que ninguno espere al otro. **El reparto es alternado**: cada quien programa bloques de los dos tracks.
+
+| Persona | GitHub / git | Bloques, en orden |
+|---|---|---|
+| Nicolás | `Nicoco15` | A1, B2, A3, B4, A5, B6, A7, B8 |
+| Ricardo | `Richardrobles25` (en git, `Ricardo Nolasco`) | B1, A2, B3, A4, B5, A6, B7, A8 |
+
+B9 y las fases compartidas son de los dos.
+
+### Dueño de cada carpeta (igual que `.github/CODEOWNERS`)
+
+| Dueño | Carpetas de `src/features/` |
+|---|---|
+| Nicolás | `search`, `catalog`, `payments`, `chat`, `notifications`, `invitations`, `account`, `provider/calendar`, `admin/operation` |
+| Ricardo | `auth`, `bookings`, `events`, `planner`, `reviews`, `subscriptions`, `provider` (menos `calendar`), `admin/business` |
+| Los dos | `media`, `admin` (lo demás) |
+
+**Compartido (cambios solo con PR aprobado por ambos):** `src/shared/`, `supabase/`, `docs/`, `.github/`, `CLAUDE.md` y la configuración de la raíz.
 
 **Track A — Organizador y transacciones**
 Carpetas: `src/features/{search,catalog,planner,bookings,payments,chat,reviews,invitations,events}`
@@ -60,7 +77,7 @@ Requisitos: RF-002, 003, 005, 008, 010 a 012, RF-022 a 024, RF-044, RF-056 a 067
 
 **Tabla compartida:** `resource_slots` (horarios ocupados). La usan los dos tracks, se escribe solo con funciones RPC y se cambia con PR aprobado por ambos.
 
-**Regla de oro:** cada quien modifica solo las carpetas y tablas de su track. Los contratos compartidos (`docs/contratos.md`, tipos de TypeScript, tablas de otro track) solo se cambian con Pull Request aprobado por ambos socios.
+**Regla de oro:** cada quien modifica solo sus carpetas y las tablas del bloque que está haciendo. Los contratos compartidos (`docs/contratos.md`, tipos de TypeScript, tablas de otro track) solo se cambian con Pull Request aprobado por ambos socios.
 
 ### Contratos compartidos (definidos en la Fase 1, en `docs/contratos.md`)
 
@@ -76,7 +93,7 @@ Si necesitas algo del otro track que aún no existe, usa la versión simulada de
 ## 5. Cómo trabajar en cada sesión
 
 1. Antes de programar, di qué bloque vas a trabajar (por ejemplo "Bloque A3 — Pagos") y qué requisitos cubre (RF-XXX), según la Guía v2.
-2. Trabaja solo dentro de las carpetas y tablas del track correspondiente (sección 4). Si el bloque toca algo compartido, dilo explícitamente y pide confirmación antes de tocarlo.
+2. Averigua quién te está pidiendo el cambio (`git config user.name`) y trabaja solo dentro de sus carpetas y las tablas de su bloque (sección 4). Si hace falta tocar una carpeta de la otra persona o algo compartido, **no lo hagas todavía**: dilo explícitamente y pide confirmación.
 3. Primero da un plan corto de lo que vas a hacer, luego implementa un requisito o un grupo pequeño a la vez.
 4. Cada requisito o grupo pequeño va en su propia rama: `feat/<track>-<bloque>-<tema>` (ej. `feat/A3-pagos-stripe`).
 5. Todo lo relacionado con reservas, pagos y doble reserva lleva pruebas automáticas obligatorias.
@@ -85,9 +102,9 @@ Si necesitas algo del otro track que aún no existe, usa la versión simulada de
 
 ## 6. Estado del proyecto
 
-- **Fase actual:** Fase 0 — Preparación. Identidad visual lista (idea, nombre y logo definidos). Repositorio de GitHub y proyecto de Supabase (`OrganiceBD`, región `us-east-2`) ya creados. Faltan por resolver: acuerdo entre socios, asignación de tracks, resto de cuentas de servicio, gestor de contraseñas compartido y trámites legales de la Fase 4.
-- **Track A asignado a:** Por definir.
-- **Track B asignado a:** Por definir.
+- **Fase actual:** Fase 1 — Cimientos (23/11 al 13/12/2026). Listos: proyecto base, revisión automática, base de datos (aplicada en Supabase), permisos, contratos, sistema de diseño y datos de prueba. Faltan: autenticación (1.6) y localización es-MX (1.8), de Ricardo; diseños D01, D02 y D04; la vista previa en la revisión automática.
+- **Reparto:** alternado (sección 4).
+- **Carpeta del proyecto:** no clonarlo dentro de iCloud, OneDrive u otra carpeta sincronizada.
 - **Correo del proyecto:** `organiceadmin@gmail.com` (cuenta principal para todas las cuentas de servicio). **Dominio propio:** se compra al inicio de la Fase 1 (decisión del 04/11/2026, que sustituye a la de no comprarlo), antes de configurar el correo transaccional, el login con Google y Facebook y WhatsApp Business, que lo necesitan. Hasta que exista, no usar un dominio en correos, contratos ni configuración.
 - **Pasarela de pagos elegida:** Por definir. La primera versión usa una sola: se abren cuentas de prueba en Stripe Connect y Conekta y se elige comparando pagos divididos, OXXO, SPEI, meses sin intereses y pago diferido. Cuentas de ambas en proceso de alta.
 - **Figura legal / RFC:** Por definir.
@@ -98,6 +115,6 @@ Si necesitas algo del otro track que aún no existe, usa la versión simulada de
 
 - No recortar el alcance a un MVP: el producto se construye completo, por bloques, no por "lo mínimo indispensable".
 - No implementar autenticación, hash de contraseñas o manejo de tarjetas a mano.
-- No modificar código o tablas fuera del track asignado sin PR aprobado.
+- No modificar carpetas de la otra persona ni algo compartido sin avisar y sin PR aprobado.
 - No mostrar el contacto del proveedor al usuario antes de que aparte.
 - No permitir que una reserva se confirme sin pasar por las funciones RPC con la restricción de exclusión.

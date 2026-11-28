@@ -1,0 +1,32 @@
+# Cimiento 1.10 · Dueño de cada carpeta (ver CLAUDE.md §4).
+# @Nicoco15 = Nicolás · @Richardrobles25 = Ricardo
+# Reparto alternado: Nicolás A1, B2, A3, B4, A5, B6, A7, B8 · Ricardo B1, A2, B3, A4, B5, A6, B7, A8.
+# Gana la última regla que coincide.
+
+# Todo lo que no tenga dueño propio es compartido y lo revisan los dos.
+*                                  @Nicoco15 @Richardrobles25
+
+# Nicolás
+/src/features/search/              @Nicoco15
+/src/features/catalog/             @Nicoco15
+/src/features/payments/            @Nicoco15
+/src/features/chat/                @Nicoco15
+/src/features/notifications/       @Nicoco15
+/src/features/invitations/         @Nicoco15
+/src/features/account/             @Nicoco15
+
+# Ricardo
+/src/features/auth/                @Richardrobles25
+/src/features/bookings/            @Richardrobles25
+/src/features/events/              @Richardrobles25
+/src/features/planner/             @Richardrobles25
+/src/features/reviews/             @Richardrobles25
+/src/features/subscriptions/       @Richardrobles25
+/src/features/provider/            @Richardrobles25
+/src/features/provider/calendar/   @Nicoco15
+
+# Carpetas que usan los dos en distintos bloques
+/src/features/media/               @Nicoco15 @Richardrobles25
+/src/features/admin/               @Nicoco15 @Richardrobles25
+/src/features/admin/operation/     @Nicoco15
+/src/features/admin/business/      @Richardrobles25
