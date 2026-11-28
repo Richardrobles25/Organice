@@ -45,7 +45,7 @@ select throws_ok($$ delete from public.audit_logs $$,
   'P0001', null, 'la bitácora no se puede borrar');
 
 set local role anon;
-select is((select count(*)::int from public.provider_contacts), 0,
+select throws_ok($$ select * from public.provider_contacts $$, '42501', null,
   'un visitante no ve el contacto de ningún proveedor');
 select throws_ok($$
   insert into public.resource_slots (resource_id, during, kind) values
