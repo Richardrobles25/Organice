@@ -94,10 +94,12 @@ Base de datos local (necesita Docker Desktop abierto):
 
 ```bash
 npm run db:start    # enciende la base (la primera vez descarga imágenes)
-npm run db:reset    # borra la base local y aplica todas las migraciones
+npm run db:reset    # borra la base local, aplica las migraciones y carga datos de prueba
 npm run db:test     # pruebas de la base, incluida la de reservas simultáneas
 npm run db:stop
 ```
+
+Los datos de prueba (30 proveedores, 20 usuarios y 50 reservas ficticias) y las cuentas locales para entrar están en `supabase/seed.sql`. Son solo para tu compu: no se suben a la nube.
 
 Variables de entorno (`.env.example`):
 ```
