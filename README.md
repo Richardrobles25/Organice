@@ -77,6 +77,10 @@ npm run dev
 
 GitHub Actions revisa cada Pull Request (aplicación y base de datos, ver `.github/workflows/ci.yml`). Si sale en rojo, no se hace merge.
 
+### Sistema de diseño
+
+Con `npm run dev`, abre `/sistema` para ver todos los componentes. Se importan desde `src/shared/components`; los colores, fuentes y espacios están en `src/shared/styles/tokens.css`. Siguen las pantallas finales del Figma: Organice Custom v2 en títulos grandes (clase `titulo-grande` o `titulo-seccion`) e Inter en todo lo demás.
+
 Antes de abrir un Pull Request:
 
 ```bash

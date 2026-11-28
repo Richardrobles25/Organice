@@ -1,0 +1,123 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-4);
+  min-height: 80px;
+  padding: 0 40px;
+  background: var(--color-blanco);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.logo {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.logo img {
+  object-fit: contain;
+}
+
+.links {
+  display: flex;
+  gap: var(--espacio-2);
+}
+
+.links a {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  height: 44px;
+  padding: 0 var(--espacio-4);
+  border-bottom: 2px solid transparent;
+  color: var(--color-secundario);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.links a[aria-current='page'] {
+  border-color: var(--color-tinta);
+  color: var(--color-tinta);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.round,
+.account {
+  position: relative;
+  display: grid;
+  place-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radio-pildora);
+  color: var(--color-tinta);
+}
+
+.round {
+  background: var(--color-fondo-claro);
+}
+
+.account {
+  border: 1px solid var(--color-borde);
+}
+
+.avatar {
+  display: grid;
+  place-content: center;
+  width: 30px;
+  height: 30px;
+  background: var(--color-placeholder);
+  border-radius: var(--radio-pildora);
+}
+
+.hat {
+  position: absolute;
+  top: -12px;
+  left: 18px;
+  width: 17px;
+  transform: rotate(14deg);
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: var(--color-tinta);
+  border-radius: var(--radio-pildora);
+  color: var(--color-blanco);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.corner {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  box-shadow: 0 0 0 2px var(--color-blanco);
+}
+
+@media (max-width: 899px) {
+  .header {
+    min-height: 64px;
+    padding: 0 var(--espacio-4);
+  }
+
+  .logo img {
+    width: 120px;
+    height: 40px;
+  }
+
+  .links {
+    display: none;
+  }
+}

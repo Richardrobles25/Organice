@@ -1,0 +1,41 @@
+.checkbox {
+  display: flex;
+  gap: var(--espacio-3);
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 22px;
+  cursor: pointer;
+}
+
+.input {
+  appearance: none;
+  display: grid;
+  flex-shrink: 0;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  background: var(--color-blanco);
+  border: 1.5px solid var(--color-atenuado);
+  border-radius: var(--radio-casilla);
+  cursor: pointer;
+}
+
+.input:checked {
+  background: var(--color-tinta);
+  border-color: var(--color-tinta);
+}
+
+.input:checked::after {
+  content: '';
+  width: 5px;
+  height: 10px;
+  margin-top: -2px;
+  border: solid var(--color-blanco);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-ocupado);
+}
